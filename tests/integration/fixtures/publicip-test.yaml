@@ -1,0 +1,13 @@
+---
+apiVersion: osac.openshift.io/v1alpha1
+kind: PublicIP
+metadata:
+  name: test-public-ip
+  namespace: osac-system
+  annotations:
+    osac.openshift.io/implementation-strategy: metallb-l2
+    osac.openshift.io/publicippool-name: publicippool-abc123
+spec:
+  pool: test-pool-uuid
+status:
+  desiredConfigVersion: "1"

@@ -1,0 +1,41 @@
+---
+- name: PublicIP Create - Baseline Test
+  hosts: localhost
+  gather_facts: true
+  vars_files:
+    - ../../../common_vars.yml
+
+  tasks:
+    - name: Read PublicIP fixture
+      ansible.builtin.set_fact:
+        test_public_ip: "{{ lookup('file', '../../../fixtures/publicip-test.yaml') | from_yaml }}"
+
+    - name: Set test variables for baseline workflow
+      ansible.builtin.set_fact:
+        ansible_eda:
+          event:
+            payload: "{{ test_public_ip }}"
+
+- name: Import public IP create playbook (baseline)
+  ansible.builtin.import_playbook: ../../../../../playbook_osac_create_public_ip.yml
+
+- name: Verify baseline results
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../../../common_vars.yml
+
+  tasks:
+    - name: Verify public IP name extracted
+      ansible.builtin.assert:
+        that:
+          - public_ip_name is defined
+          - public_ip_name == "test-public-ip"
+        fail_msg: "Public IP name not extracted correctly"
+
+    - name: Verify implementation strategy extracted
+      ansible.builtin.assert:
+        that:
+          - implementation_strategy is defined
+          - implementation_strategy == "metallb-l2"
+        fail_msg: "Implementation strategy not extracted correctly"
